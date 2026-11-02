@@ -31,11 +31,10 @@ export function walkthrough04_SelfAttention(args: IWalkthroughArgs) {
     wt.dimHighlightBlocks = [layout.residual0, block0.ln1.lnResid, ...head2.cubes];
 
     commentary(wt, null, 0)`
-The self-attention layer is perhaps the heart of the Transformer and of GPT. It's the phase where the
-columns in our input embedding matrix "talk" to each other. Up until now, and in all other phases,
-the columns can be regarded independently.
+自注意力层大概是 Transformer 和 GPT 的核心。正是在这个阶段，输入嵌入矩阵的各列开始相互"交流"。
+在此之前以及在其他所有阶段里，各列都可以看作是彼此独立的。
 
-The self-attention layer is made up of several heads, and we'll focus on one of them for now.`;
+自注意力层由若干个头（head）组成，我们先只关注其中一个。`;
     breakAfter();
     let t_moveCamera = afterTime(null, 1.0);
     let t_highlightHeads = afterTime(null, 2.0);
@@ -44,18 +43,17 @@ The self-attention layer is made up of several heads, and we'll focus on one of 
 
     breakAfter();
     commentary(wt)`
-The first step is to produce three vectors for each of the ${c_dimRef('T', DimStyle.T)} columns from the ${c_blockRef('normalized input embedding matrix', block0.ln1.lnResid)}.
-These vectors are the Q, K, and V vectors:
+第一步是为 ${c_dimRef('T', DimStyle.T)} 个列各自生成三个向量，输入是 ${c_blockRef('归一化后的输入嵌入矩阵', block0.ln1.lnResid)}。
+这三个向量就是 Q、K、V 向量：
 
 ${embedInline(<ul>
-    <li>Q: <BlockText blk={head2.qBlock}>Query vector</BlockText></li>
-    <li>K: <BlockText blk={head2.kBlock}>Key vector</BlockText></li>
-    <li>V: <BlockText blk={head2.vBlock}>Value vector</BlockText></li>
+    <li>Q: <BlockText blk={head2.qBlock}>查询向量</BlockText></li>
+    <li>K: <BlockText blk={head2.kBlock}>键向量</BlockText></li>
+    <li>V: <BlockText blk={head2.vBlock}>值向量</BlockText></li>
 </ul>)}
 
-To produce one of these vectors, we perform a matrix-vector multiplication with a bias added. Each
-output cell is some linear combination of the input vector. E.g. for the ${c_blockRef('Q vectors', head2.qBlock)}, this is done with a dot product between
-a row of the ${c_blockRef('Q-weight matrix', head2.qWeightBlock)} and a column of the ${c_blockRef('input matrix', block0.ln1.lnResid)}.`;
+要生成其中一个向量，我们做一次带偏置的矩阵-向量乘法。每个输出格都是输入向量的某种线性组合。
+例如对 ${c_blockRef('Q 向量', head2.qBlock)} 来说，这就是把 ${c_blockRef('Q 权重矩阵', head2.qWeightBlock)} 的一行与 ${c_blockRef('输入矩阵', block0.ln1.lnResid)} 的一列做点积。`;
     breakAfter();
 
     let t_focusQCol = afterTime(null, 1.0);
@@ -63,9 +61,8 @@ a row of the ${c_blockRef('Q-weight matrix', head2.qWeightBlock)} and a column o
 
     breakAfter();
     commentary(wt)`
-The dot product operation, which we'll see a lot of, is quite simple: We pair each element from
-the first vector with the corresponding element from the second vector, multiply the pairs together
-and then add the results up.`;
+点积这个操作后面会反复出现，它非常简单：把第一个向量的每个元素与第二个向量中对应的元素配对相乘，
+再把所有结果加起来。`;
     breakAfter();
 
     let t_moveDotCells = afterTime(null, 2.0, 0.5);
@@ -79,11 +76,10 @@ and then add the results up.`;
     breakAfter();
     commentary(wt)`
 
-This is a general and simple way of ensuring each output element can be influenced by all the
-elements in the input vector (where that influence is determined by the weights). Hence its frequent
-appearance in neural networks.
+这是一种通用而简单的做法，能保证每个输出元素都受到输入向量中所有元素的影响（影响大小由权重决定）。
+神经网络里之所以到处都有它，原因就在于此。
 
-We repeat this operation for each output cell in the Q, K, V vectors:`;
+我们对 Q、K、V 向量中的每个输出格重复这个操作：`;
     breakAfter();
 
     let t_revertFocusCol = afterTime(null, 0.25, 0.5);
@@ -97,10 +93,10 @@ gives us a hint: "key" and "value" are reminiscent of a dictionary in software, 
 values. Then "query" is what we use to look up the value.
 
 ${embedInline(<div className='ml-4'>
-    <div className='mt-1 text-center italic'>Software analogy</div>
-    <div className='text-sm mt-1 mb-1 text-gray-600'>Lookup table:</div>
+    <div className='mt-1 text-center italic'>软件中的类比</div>
+    <div className='text-sm mt-1 mb-1 text-gray-600'>查找表：</div>
     <div className='font-mono'>{'table = { "key0": "value0", "key1": "value1", ... }'}</div>
-    <div className='text-sm mt-1 mb-1 text-gray-600'>Query Process:</div>
+    <div className='text-sm mt-1 mb-1 text-gray-600'>查询过程：</div>
     <div className='font-mono'>{'table["key1"] => "value1"'}</div>
 </div>)}
 
@@ -115,8 +111,8 @@ ${embedInline((() => {
     let qCol = dimStyleColor(DimStyle.Aggregates);
 
     return <div className='ml-4'>
-        <div className='mt-1 text-center italic'>Self Attention</div>
-        <div className='text-sm mt-2 mb-1 text-gray-600'>Lookup table:</div>
+        <div className='mt-1 text-center italic'>自注意力</div>
+        <div className='text-sm mt-2 mb-1 text-gray-600'>查找表：</div>
         <div className='font-mono flex items-center'>K:
             <div className='mx-2 my-1'>{makeTextVector(keyCol)}</div>
             <div className='mx-2 my-1'>{makeTextVector(keyCol)}</div>
@@ -127,7 +123,7 @@ ${embedInline((() => {
             <div className='mx-2 my-1'>{makeTextVector(valCol)}</div>
             <div className='mx-2 my-1'>{makeTextVector(valCol)}</div>
         </div>
-        <div className='text-sm mt-2 mb-1 text-gray-600'>Query Process:</div>
+        <div className='text-sm mt-2 mb-1 text-gray-600'>查询过程：</div>
         <div className='font-mono flex items-center'>
             <div className='flex items-center'>Q: <div className='mx-2 my-1'>{makeTextVector(qCol)}</div></div>
         </div>
@@ -137,7 +133,7 @@ ${embedInline((() => {
             <div className='flex items-center mx-2'>w2 = <div className='m-1'>{makeTextVector(qCol)}</div>.<div className='m-1'>{makeTextVector(keyCol)}</div></div>
         </div>
         <div className='font-mono flex items-center my-2'>
-            [w0n, w1n, w2n] =&nbsp;<span className='italic'>normalization</span>([w0, w1, w2])
+            [w0n, w1n, w2n] =&nbsp;<span className='italic'>归一化</span>([w0, w1, w2])
         </div>
         <div className='font-mono flex items-center'>
             result =
@@ -160,30 +156,26 @@ we will query from:`;
 // columns each have a K (key) vector, which represents the information that that column has, and our
 // Q (query) vector is what information is relevant to us.
     commentary(wt)`
-The {K, V} entries of our lookup are the 6 columns in the past, and the Q value is the current time.
+查找表中 {K, V} 的条目就是过去 6 列的内容，而 Q 取的是当前时刻。
 
-We first calculate the dot product between the ${c_blockRef('Q vector', head2.qBlock)} of the current column (${c_dimRef('t = 5', DimStyle.T)}) and the ${c_blockRef('K vectors', head2.kBlock)}
-of each of the those previous columns. These are then stored in the corresponding row (${c_dimRef('t = 5', DimStyle.T)})
-of the ${c_blockRef('attention matrix', head2.attnMtx)}.`;
+我们先计算当前列（${c_dimRef('t = 5', DimStyle.T)}）的 ${c_blockRef('Q 向量', head2.qBlock)} 与它之前每一列的 ${c_blockRef('K 向量', head2.kBlock)}
+之间的点积。结果分别存入 ${c_blockRef('注意力矩阵', head2.attnMtx)} 相应的行（${c_dimRef('t = 5', DimStyle.T)}）。`;
     breakAfter();
 
     let t_processAttnRow = afterTime(null, 3.0);
 
     breakAfter();
     commentary(wt)`
-These dot products are a way of measuring the similarity between the two vectors. If they're very
-similar, the dot product will be large. If they're very different, the dot product will be small or
-negative.
+这些点积用来度量两个向量之间的相似度。如果两者非常相似，点积就大；如果差别很大，点积就小，甚至为负。
 
-The idea of only using the query against past keys makes this _causal_ self-attention. That is,
-tokens can't "see into the future".
+只用查询向量去匹配过去的键，这种做法叫 _因果_ 自注意力。也就是说，
+token 不能"看见未来"。
 
-Another element is that after we take the dot product, we divide by sqrt(${c_dimRef('A', DimStyle.A)}), where
-${c_dimRef('A', DimStyle.A)} is the length of the Q/K/V vectors. This scaling is done to prevent large values from
-dominating the normalization (softmax) in the next step.
+另一点是：做完点积后要除以 sqrt(${c_dimRef('A', DimStyle.A)})，其中
+${c_dimRef('A', DimStyle.A)} 是 Q/K/V 向量的长度。这个缩放是为了避免过大的数值
+在下一步的归一化（softmax）中占据主导。
 
-We'll mostly skip over the softmax operation (described later); suffice it to say, each row is normalized to sum
-to 1.`;
+softmax 操作我们大致跳过（后面会讲）；一句话，每一行都会被归一化成总和为 1。`;
     breakAfter();
 
     let t_processAttnSmAggRow = afterTime(null, 1.0);
@@ -191,9 +183,9 @@ to 1.`;
 
     breakAfter();
     commentary(wt)`
-Finally, we can produce the output vector for our column (${c_dimRef('t = 5', DimStyle.T)}). We look at the (${c_dimRef('t = 5', DimStyle.T)}) row of the
-${c_blockRef('normalized self-attention matrix', head2.attnMtxSm)} and for each element, multiply the corresponding ${c_blockRef('V vector', head2.vBlock)} of the
-other columns element-wise.`;
+最后，我们可以为这一列（${c_dimRef('t = 5', DimStyle.T)}）生成输出向量。我们看
+${c_blockRef('归一化后的自注意力矩阵', head2.attnMtxSm)} 的第（${c_dimRef('t = 5', DimStyle.T)}）行，对其中每个元素，按元素乘以
+其他列的 ${c_blockRef('V 向量', head2.vBlock)}。`;
     breakAfter();
 
     let t_zoomVOutput = afterTime(null, 0.4, 0.5);
@@ -207,10 +199,9 @@ other columns element-wise.`;
 
     breakAfter();
     commentary(wt)`
-Then we can add these up to produce the output vector. Thus, the output vector will be dominated by
-V vectors from columns that have high scores.
+然后把它们加起来，就得到输出向量。于是输出向量主要由那些得分高的列的 V 向量决定。
 
-Now we know the process, let's run it for all the columns.`;
+流程清楚了，我们来对所有列都跑一遍。`;
 
     breakAfter();
 
@@ -220,10 +211,9 @@ Now we know the process, let's run it for all the columns.`;
 
     breakAfter();
     commentary(wt)`
-And that's the process for a head of the self-attention layer. So the main goal of self-attention is
-that each column wants to find relevant information from other columns and extract their values, and
-does so by comparing its _query_ vector to the _keys_ of those other columns. With the added restriction
-that it can only look in the past.
+以上就是自注意力层中一个头的处理过程。自注意力的核心目标是：每一列都想从其他列中找出相关的信息并提取它们的值，
+做法是用自己的 _查询_ 向量去比对那些列的 _键_，同时还有一个限制——
+它只能回看过去。
 `;
 
 // Running this process for all the columns produces our self-attention matrix, which is a square

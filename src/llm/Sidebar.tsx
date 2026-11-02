@@ -74,7 +74,7 @@ export const WalkthroughSidebar: React.FC = () => {
                     {menuVisible && <Popup targetEl={menuButtonEl} placement={PopupPos.BottomLeft} className={s.mainMenu} closeBackdrop onClose={() => setMenuVisible(false)}>
                         {menu}
                     </Popup>}
-                    <div onClick={() => stepModel()}>Step</div>
+                    <div onClick={() => stepModel()}>单步执行</div>
                 </div> */}
                 <Commentary />
             </div>

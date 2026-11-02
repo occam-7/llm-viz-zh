@@ -13,40 +13,36 @@ export function walkthrough09_Output(args: IWalkthroughArgs) {
 
     let c0 = commentary(wt, null, 0)`
 
-Finally, we come to the end of the model. The output of the final transformer block is passed through
-a layer normalization, and then we use a linear transformation (matrix multiplication), this time without a bias.
+终于来到了模型的末端。最后一个 Transformer 模块的输出先经过
+层归一化，然后做一次线性变换（矩阵乘法），这一次不加偏置。
 
-This final transformation takes each of our column vectors from length C to length nvocab. Hence,
-it's effectively producing a score for each word in the vocabulary for each of our columns. These
-scores have a special name: logits.
+这最后一次变换把每个列向量从长度 C 变成 nvocab。因此，
+它实际上为每一列、为词表中的每个词给出一个分数。这些分数有个专门的名字：logits。
 
-The name "logits" comes from "log-odds," i.e., the logarithm of the odds of each token. "Log" is
-used because the softmax we apply next does an exponentiation to convert to "odds" or probabilities.
+"logits" 这个名字来自 "log-odds"，即每个 token 赔率的对数。之所以用 "log"，
+是因为紧接着施加的 softmax 会做指数化，把赔率或概率转换回来。
 
-To convert these scores into nice probabilities, we pass them through a softmax operation. Now, for
-each column, we have a probability the model assigns to each word in the vocabulary.
+为了把这些分数变成漂亮的概率，我们把它们送进 softmax。现在每一列都有了
+模型为词表中每个词分配的概率。
 
-In this particular model, it has effectively learned all the answers to the question of how to sort
-three letters, so the probabilities are heavily weighted toward the correct answer.
+在这个特定的模型里，它其实已经学会了如何排列三个字母的全部答案，
+所以概率会大幅偏向正确答案。
 
-When we're stepping the model through time, we use the last column's probabilities to determine the
-next token to add to the sequence. For example, if we've supplied six tokens into the model, we'll
-use the output probabilities of the 6th column.
+当我们让模型一步步往前跑时，我们用最后一列的概率来决定
+下一个要加入序列的 token。例如，如果我们已经向模型输入了六个 token，
+就会使用第 6 列的输出概率。
 
-This column's output is a series of probabilities, and we actually have to pick one of them to use
-as the next in the sequence. We do this by "sampling from the distribution." That is, we randomly
-choose a token, weighted by its probability. For example, a token with a probability of 0.9 will be
-chosen 90% of the time.
+这一列的输出是一串概率，我们必须从中挑一个作为序列中的下一个 token。做法是"从分布中采样"：
+也就是按概率随机挑一个 token。比如概率为 0.9 的 token，
+有 90% 的概率会被选中。
 
-There are other options here, however, such as always choosing the token with the highest probability.
+当然还有别的做法，比如总是选概率最高的那个 token。
 
-We can also control the "smoothness" of the distribution by using a temperature parameter. A higher
-temperature will make the distribution more uniform, and a lower temperature will make it more
-concentrated on the highest probability tokens.
+我们还可以用温度参数来控制分布的"平滑程度"。温度越高，分布越均匀；温度越低，
+分布越集中在高概率的 token 上。
 
-We do this by dividing the logits (the output of the linear transformation) by the temperature before
-applying the softmax. Since the exponentiation in the softmax has a large effect on larger numbers,
-making them all closer together will reduce this effect.
+具体做法是：在施加 softmax 之前，先把 logits（线性变换的输出）除以温度。
+由于 softmax 中的指数运算会放大较大的数，把它们拉得更接近就会削弱这个效应。
 `;
 
 }

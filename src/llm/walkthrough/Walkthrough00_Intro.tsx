@@ -58,10 +58,10 @@ export function walkthroughIntro(args: IWalkthroughArgs) {
 
     setInitialCamera(state, new Vec3(184.744, 0.000, -636.820), new Vec3(296.000, 16.000, 13.500));
 
-    let c0 = commentary(wt, null, 0)`Welcome to the walkthrough of the GPT large language model! Here we'll explore the model _nano-gpt_, with a mere 85,000 parameters.
+    let c0 = commentary(wt, null, 0)`欢迎来到 GPT 大语言模型的可视化漫游！我们要观察的模型叫 _nano-gpt_，它只有区区 85,000 个参数。
 
-Its goal is a simple one: take a sequence of six letters: ${embed(ExampleInputOutput)}
-and sort them in alphabetical order, i.e. to "ABBBCC".`;
+它的目标很简单：输入由六个字母组成的序列：${embed(ExampleInputOutput)}
+然后按字母顺序把它们排好，也就是排成 "ABBBCC"。`;
 
     if (c0.t > 0) {
         for (let cube of layout.cubes) {
@@ -96,9 +96,9 @@ and sort them in alphabetical order, i.e. to "ABBBCC".`;
     let tokenStr = c_str('_token_', 0, DimStyle.Token);
     let tokenIdxStr = c_str('_token index_', 0, DimStyle.TokenIdx);
 
-    commentary(wt, t6)`We call each of these letters a ${tokenStr}, and the set of the model's different tokens make up its _vocabulary_:${embed(TokenVocab)}
+    commentary(wt, t6)`我们把每个字母称作一个 ${tokenStr}，模型所有不同的 token 合起来构成它的 _词表_：${embed(TokenVocab)}
 
-    From this table, each token is assigned a number, its ${tokenIdxStr}. And now we can enter this sequence of numbers into the model:${embed(ExampleTokenValues)}\n`;
+    在这张表里，每个 token 对应一个编号，也就是它的 ${tokenIdxStr}。于是我们可以把这串编号输入模型：${embed(ExampleTokenValues)}`;
     breakAfter();
 
     let t7 = afterTime(null, 1.5, 0.5);
@@ -129,8 +129,8 @@ and sort them in alphabetical order, i.e. to "ABBBCC".`;
 
     breakAfter();
 
-    let c5 = commentary(wt)`In the 3d view, each green cell represents a number being processed, and each blue cell is a weight. ${embed(GreenBlueCells)}
-    Each number in the sequence first gets turned into a 48 element vector (a size chosen for this particular model). This is called an _embedding_.`;
+    let c5 = commentary(wt)`在 3D 视图里，每个绿色格子代表一个正在参与计算的数字，每个蓝色格子是一个权重。${embed(GreenBlueCells)}
+    序列中的每个数字首先会被转换成一个 48 维的向量（这个维度是模型自己选的）。这一步称为 _嵌入_（embedding）。`;
     breakAfter(c5);
 
     {
@@ -166,7 +166,7 @@ and sort them in alphabetical order, i.e. to "ABBBCC".`;
     }
 
     breakAfter();
-    commentary(wt)`The embedding is then passed through the model, going through a series of layers, called transformers, before reaching the bottom.`;
+    commentary(wt)`随后嵌入会被送进模型，依次穿过若干层叫作 Transformer 的结构，一直到最底部。`;
     breakAfter();
 
     {
@@ -220,11 +220,9 @@ and sort them in alphabetical order, i.e. to "ABBBCC".`;
         }
     }
 
-    commentary(wt)`So what's the output? A prediction of the next token in the sequence. So at the 6th entry, we get probabilities that the next token is
-        going to be 'A', 'B', or 'C'.`
+    commentary(wt)`那么输出是什么？是对序列中下一个 token 的预测。所以在第 6 个位置上，我们得到的是下一个 token 为 'A'、'B' 或 'C' 的概率。`
 
-    commentary(wt)`In this case, the model is pretty sure it's going to be 'A'. Now, we can feed this prediction back into the top of the model, and repeat
-    the entire process.`;
+    commentary(wt)`在这个例子里，模型相当肯定下一个是 'A'。接下来我们可以把这个预测结果从模型顶部再喂回去，把整个过程重复一遍。`;
 
     breakAfter();
 }
@@ -396,7 +394,7 @@ const TokenVocab: React.FC = () => {
                     <th>token</th><td>A</td><td>B</td><td>C</td>
                 </tr>
                 <tr className={s.tokIndex} style={{ color: dimStyleColor(DimStyle.TokenIdx).toHexColor() }}>
-                    <th>index</th><td>0</td><td>1</td><td>2</td>
+                    <th>索引</th><td>0</td><td>1</td><td>2</td>
                 </tr>
             </tbody>
         </table>
@@ -416,12 +414,12 @@ const GreenBlueCells: React.FC = () => {
             <div className={s.cellInfoCol}>
                 <Cell nums={greenNums} color={greenColor} mul={0.5} />
                 <Graph nums={greenNums} color={greenColor} setNums={setGreenNums} />
-                <div className={s.cellInfoText}>being processed</div>
+                <div className={s.cellInfoText}>正在参与计算</div>
             </div>
             <div className={s.cellInfoCol}>
                 <Cell nums={blueNums} color={blueColor} mul={1} />
                 <Graph nums={blueNums} color={blueColor} setNums={setBlueNums} />
-                <div className={s.cellInfoText}>weights</div>
+                <div className={s.cellInfoText}>权重</div>
             </div>
         </div>
     </div>

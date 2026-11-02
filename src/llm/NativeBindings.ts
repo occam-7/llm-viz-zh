@@ -2,7 +2,7 @@ import { IGptModelConfig, TensorF32 } from "@/src/utils/tensor";
 
 export async function loadNativeBindings() {
 
-    let resp = await fetch('/native.wasm');
+    let resp = await fetch(`${process.env.NEXT_PUBLIC_BASE_PATH ?? ''}/native.wasm`);
     // load wasm file and return the module
 
     let lineStr = "";
