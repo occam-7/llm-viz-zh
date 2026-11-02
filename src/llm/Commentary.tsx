@@ -261,7 +261,7 @@ export const Commentary: React.FC = () => {
             <button className={clsx(s.btn, s.prevNextBtn)} onClick={() => handlePhaseDeltaClick(-1)}>
                 <FontAwesomeIcon icon={faChevronLeft} />
             </button>
-            <div className={s.chapterTitle}>Chapter: {phase.title}</div>
+            <div className={s.chapterTitle}>章节：{phase.title}</div>
             <button className={clsx(s.btn, s.prevNextBtn)} onClick={() => handlePhaseDeltaClick(1)}>
                 <FontAwesomeIcon icon={faChevronRight} />
             </button>
